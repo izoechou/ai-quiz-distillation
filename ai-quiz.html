@@ -759,30 +759,48 @@ function generateShareImage() {
   });
 }
 
-// 使用qrserver.com生成标准QR码（可被所有扫码器识别）
+// 使用qrcode.js前端库生成标准QR码（零外部依赖，100%可扫）
 function drawSimpleQR(ctx, x, y, size) {
   const url = 'https://ai-quiz-distillation.vercel.app/ai-quiz.html';
-  const img = new Image();
-  img.crossOrigin = 'anonymous';
-  img.onload = function() {
-    ctx.drawImage(img, x, y, size, size);
-    // 重新触发下载
-    const canvas = document.getElementById('shareCanvas');
-    canvas.toBlob(blob => {
-      const blobUrl = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = blobUrl; a.download = 'ZLTI-' + resultData.name + '.png';
-      a.click(); URL.revokeObjectURL(blobUrl);
-    });
-  };
-  img.onerror = function() {
-    ctx.fillStyle = 'rgba(0,255,200,0.05)';
-    ctx.fillRect(x, y, size, size);
-    ctx.fillStyle = '#556'; ctx.font = 'bold 14px sans-serif';
-    ctx.textAlign = 'center';
-    ctx.fillText('扫码测试', x + size/2, y + size/2 + 5);
-  };
-  img.src = 'https://api.qrserver.com/v1/create-qr-code/?size=' + size + 'x' + size + '&data=' + encodeURIComponent(url) + '&bgcolor=0a0a10&color=00ffc8&format=png';
+  // 先画背景框
+  ctx.fillStyle = '#0a0a10';
+  ctx.fillRect(x, y, size, size);
+  
+  // 用qrcode库生成到离屏canvas
+  const qrCanvas = document.createElement('canvas');
+  
+  QRCode.toCanvas(qrCanvas, url, {
+    width: Math.min(size, 512),
+    margin: 1,
+    color: { dark: '#00ffc8', light: '#0a0a10' },
+    errorCorrectionLevel: 'M'
+  }, function(error) {
+    if (error) {
+      console.error('QR Error:', error);
+      ctx.fillStyle = '#556';
+      ctx.font = 'bold 14px sans-serif';
+      ctx.textAlign = 'center';
+      ctx.fillText('扫码测试', x + size/2, y + size/2 + 5);
+      return;
+    }
+    
+    // 绘制到主canvas
+    ctx.drawImage(qrCanvas, x, y, size, size);
+    
+    // 重新触发下载（QR异步生成完毕后）
+    setTimeout(function() {
+      const canvas = document.getElementById('shareCanvas');
+      canvas.toBlob(blob => {
+        if (!blob) return;
+        const blobUrl = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = blobUrl;
+        a.download = 'ZLTI-' + resultData.name + '.png';
+        a.click();
+        URL.revokeObjectURL(blobUrl);
+      });
+    }, 200);
+  });
 }
 
 function wrapTextLines(ctx, text, maxW) {
