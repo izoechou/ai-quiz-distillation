@@ -96,8 +96,9 @@
   }
 
   .home-desc {
-    font-size: 18px; color: var(--accent-red); margin-bottom: 48px;
-    font-weight: 700; letter-spacing: 2px;
+    font-size: 28px; color: var(--accent-red); margin-bottom: 48px;
+    font-weight: 900; letter-spacing: 3px;
+    text-shadow: 0 0 20px rgba(255, 40, 80, 0.5), 0 0 40px rgba(255, 40, 80, 0.2);
   }
 
   .btn-start {
@@ -253,7 +254,7 @@
     background: rgba(0,255,200,0.02); border: 1px solid rgba(0,255,200,0.08);
     border-radius: 4px; padding: 20px; margin-bottom: 14px;
   }
-  .share-text { font-size: 14px; color: var(--text-secondary); line-height: 1.8; display: block; word-break: break-all; }
+  .share-text { font-size: 18px; color: var(--accent-cyan); line-height: 1.8; display: block; word-break: break-all; font-weight: 700; letter-spacing: 0.5px; }
 
   /* 按钮组 */
   .btn-share {
@@ -320,7 +321,13 @@
       <div class="tagline-box"><span id="resTagline" class="tagline"></span></div>
     </div>
 
-    <div class="desc-section animate-in delay-1">
+    <div class="share-section animate-in delay-1">
+      <span class="section-title">SHARE</span>
+      <div class="share-box"><span id="resShareText" class="share-text"></span></div>
+      <button class="btn-copy" onclick="copyShareText()">复制文案</button>
+    </div>
+
+    <div class="desc-section animate-in delay-2">
       <span class="section-title">ANALYSIS</span>
       <div id="resDesc" class="desc-content"></div>
     </div>
@@ -334,12 +341,6 @@
 
     <div class="animate-in delay-3">
       <div id="dimList" class="dim-list"></div>
-    </div>
-
-    <div class="share-section animate-in delay-4">
-      <span class="section-title">SHARE</span>
-      <div class="share-box"><span id="resShareText" class="share-text"></span></div>
-      <button class="btn-copy" onclick="copyShareText()">复制文案</button>
     </div>
 
     <div class="animate-in delay-5" style="margin-top:28px;">
@@ -720,15 +721,15 @@ function generateShareImage() {
     barY += 54;
   });
 
-  // 分享文案
+  // 分享文案（放大显眼）
   barY += 10;
   ctx.textAlign = 'left';
-  ctx.fillStyle = '#00ffc8'; ctx.font = 'bold 16px sans-serif';
+  ctx.fillStyle = '#00ffc8'; ctx.font = 'bold 18px sans-serif';
   ctx.fillText('▍ SHARE', 60, barY);
-  barY += 32;
-  ctx.fillStyle = '#778'; ctx.font = '17px sans-serif';
-  const shareLines = wrapTextLines(ctx, r.shareText, W - 120, 22);
-  shareLines.forEach(line => { ctx.fillText(line, 60, barY); barY += 26; });
+  barY += 36;
+  ctx.fillStyle = '#00ffc8'; ctx.font = 'bold 20px sans-serif';
+  const shareLines = wrapTextLines(ctx, r.shareText, W - 120, 26);
+  shareLines.forEach(line => { ctx.fillText(line, 60, barY); barY += 32; });
 
   // 二维码区域
   barY += 30;
@@ -782,7 +783,7 @@ function drawSimpleQR(ctx, x, y, size) {
     ctx.textAlign = 'center';
     ctx.fillText('扫码测试', x + size/2, y + size/2 + 5);
   };
-  img.src = 'https://api.qrserver.com/v1/create-qr-code/?size=' + size + 'x' + size + '&data=' + encodeURIComponent(url) + '&bgcolor=0a0a10&color=00ffc8&format=png';
+  img.src = 'https://myssl.com/qrcode/create?w=' + size + '&h=' + size + '&text=' + encodeURIComponent(url) + '&bgcolor=%230a0a10&color=%2300ffc8&level=M';
 }
 
 function wrapTextLines(ctx, text, maxW) {
