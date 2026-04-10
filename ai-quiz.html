@@ -3,180 +3,288 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>AI替代倒计时 — 测测你的AI替代类型</title>
+<title>ZLTI 蒸馏型人格指标</title>
 <style>
-  /* ===== 全局重置 ===== */
+  @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Noto+Sans+SC:wght@300;400;700;900&display=swap');
+
   * { margin: 0; padding: 0; box-sizing: border-box; }
-  
+
   :root {
-    --bg-primary: #0a0a0f;
-    --bg-secondary: #111118;
-    --bg-card: rgba(255,255,255,0.04);
-    --border-color: rgba(255,255,255,0.08);
-    --text-primary: #fff;
-    --text-secondary: #ccc;
-    --text-muted: #888;
-    --accent-red: #ff4757;
-    --accent-orange: #ffa502;
-    --accent-gradient: linear-gradient(135deg, #ff4757, #ffa502);
+    --bg-primary: #050508;
+    --bg-secondary: #0a0a10;
+    --bg-card: rgba(255,255,255,0.025);
+    --border-color: rgba(255,255,255,0.06);
+    --border-glow: rgba(0,255,200,0.12);
+    --text-primary: #e8e8ec;
+    --text-secondary: #a0a0b0;
+    --text-muted: #555568;
+    --accent-cyan: #00ffc8;
+    --accent-red: #ff2d55;
+    --accent-orange: #ff9500;
+    --accent-purple: #bf5af2;
+    --glow-cyan: rgba(0,255,200,0.15);
+    --glow-red: rgba(255,45,85,0.15);
+    --font-display: 'Orbitron', 'Noto Sans SC', sans-serif;
+    --font-body: 'Noto Sans SC', -apple-system, BlinkMacSystemFont, sans-serif;
   }
 
   body {
-    font-family: -apple-system, BlinkMacSystemFont, "Helvetica Neue", "PingFang SC", "Microsoft YaHei", sans-serif;
+    font-family: var(--font-body);
     background: var(--bg-primary);
     color: var(--text-secondary);
-    line-height: 1.6;
+    line-height: 1.7;
     min-height: 100vh;
     overflow-x: hidden;
+    background-image:
+      radial-gradient(ellipse at 20% 0%, rgba(0,255,200,0.03) 0%, transparent 50%),
+      radial-gradient(ellipse at 80% 100%, rgba(255,45,85,0.03) 0%, transparent 50%);
   }
 
-  .app { max-width: 480px; margin: 0 auto; padding: 20px 16px 60px; }
-  
+  .app { max-width: 480px; margin: 0 auto; padding: 20px 16px 60px; position: relative; }
   .hidden { display: none !important; }
 
-  /* ===== 首页 ===== */
-  .home { display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: calc(100vh - 80px); text-align: center; padding-top: 60px; }
-  
-  .home-title { font-size: 28px; font-weight: 900; color: var(--text-primary); letter-spacing: 3px; margin-bottom: 8px; }
-  
-  .home-subtitle { font-size: 48px; font-weight: 900; background: var(--accent-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; letter-spacing: 6px; margin-bottom: 12px; }
-  
-  .home-desc { font-size: 15px; color: var(--text-muted); margin-bottom: 40px; line-height: 1.8; }
-  
-  .btn-start {
-    width: 100%; height: 56px; border: none; border-radius: 28px;
-    background: var(--accent-gradient); color: #fff;
-    font-size: 18px; font-weight: bold; cursor: pointer;
-    box-shadow: 0 8px 32px rgba(255,71,87,0.35);
-    transition: all 0.2s ease;
-  }
-  .btn-start:hover { transform: translateY(-2px); box-shadow: 0 12px 40px rgba(255,71,87,0.45); }
-  .btn-start:active { transform: scale(0.97); opacity: 0.9; }
+  /* ===== 扫描线动画 ===== */
+  @keyframes scanline { 0% { top: -2px; } 100% { top: 100%; } }
+  @keyframes flicker { 0%,100% { opacity: 1; } 50% { opacity: 0.97; } }
+  @keyframes pulse-glow { 0%,100% { box-shadow: 0 0 20px var(--glow-cyan), inset 0 0 20px rgba(0,255,200,0.02); } 50% { box-shadow: 0 0 40px var(--glow-cyan), inset 0 0 40px rgba(0,255,200,0.04); } }
+  @keyframes fadeInUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
+  @keyframes typeIn { from { opacity: 0; filter: blur(4px); } to { opacity: 1; filter: blur(0); } }
+  @keyframes borderGlow { 0%,100% { border-color: rgba(0,255,200,0.08); } 50% { border-color: rgba(0,255,200,0.2); } }
 
-  .footer-text { position: fixed; bottom: 24px; left: 0; right: 0; text-align: center; font-size: 12px; color: #333; }
+  .animate-in { animation: fadeInUp 0.5s cubic-bezier(0.16,1,0.3,1) forwards; }
+  .delay-1 { animation-delay: 0.12s; opacity: 0; }
+  .delay-2 { animation-delay: 0.24s; opacity: 0; }
+  .delay-3 { animation-delay: 0.36s; opacity: 0; }
+  .delay-4 { animation-delay: 0.48s; opacity: 0; }
+  .delay-5 { animation-delay: 0.60s; opacity: 0; }
+
+  /* ===== 首页 ===== */
+  .home {
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    min-height: calc(100vh - 80px); text-align: center; padding-top: 40px;
+    position: relative;
+  }
+  .home::before {
+    content: ''; position: absolute; top: 0; left: 50%; transform: translateX(-50%);
+    width: 1px; height: 120px;
+    background: linear-gradient(to bottom, transparent, var(--accent-cyan), transparent);
+    opacity: 0.3;
+  }
+
+  .brand-tag {
+    font-family: var(--font-display); font-size: 11px; letter-spacing: 6px;
+    color: var(--accent-cyan); text-transform: uppercase; margin-bottom: 16px;
+    padding: 6px 20px; border: 1px solid rgba(0,255,200,0.15); border-radius: 2px;
+    background: rgba(0,255,200,0.03);
+  }
+
+  .home-title {
+    font-family: var(--font-display); font-size: 56px; font-weight: 900;
+    color: var(--text-primary); letter-spacing: 8px; margin-bottom: 4px;
+    text-shadow: 0 0 40px var(--glow-cyan);
+    line-height: 1.1;
+  }
+
+  .home-subtitle-cn {
+    font-size: 16px; font-weight: 300; color: var(--text-muted);
+    letter-spacing: 4px; margin-bottom: 8px;
+  }
+
+  .home-subtitle-en {
+    font-family: var(--font-display); font-size: 11px; color: var(--text-muted);
+    letter-spacing: 3px; margin-bottom: 32px; opacity: 0.5;
+  }
+
+  .home-desc {
+    font-size: 18px; color: var(--accent-red); margin-bottom: 48px;
+    font-weight: 700; letter-spacing: 2px;
+  }
+
+  .btn-start {
+    width: 240px; height: 56px; border: 1px solid var(--accent-cyan); border-radius: 2px;
+    background: transparent; color: var(--accent-cyan);
+    font-family: var(--font-display); font-size: 14px; font-weight: 700;
+    cursor: pointer; letter-spacing: 4px; text-transform: uppercase;
+    transition: all 0.3s ease; position: relative; overflow: hidden;
+  }
+  .btn-start::before {
+    content: ''; position: absolute; top: 0; left: -100%; width: 100%; height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(0,255,200,0.1), transparent);
+    transition: left 0.5s ease;
+  }
+  .btn-start:hover::before { left: 100%; }
+  .btn-start:hover { background: rgba(0,255,200,0.05); box-shadow: 0 0 30px var(--glow-cyan); }
+  .btn-start:active { transform: scale(0.97); }
+
+  .footer-text {
+    position: fixed; bottom: 20px; left: 0; right: 0; text-align: center;
+    font-size: 11px; color: #222; letter-spacing: 1px;
+  }
 
   /* ===== 答题页 ===== */
-  .quiz-page { padding-top: 16px; }
-  
-  .progress-bar-bg { width: 100%; height: 6px; border-radius: 3px; background: rgba(255,255,255,0.08); margin-bottom: 8px; }
-  .progress-bar-fill { height: 100%; border-radius: 3px; background: var(--accent-gradient); transition: width 0.3s ease; }
-  .progress-label { font-size: 13px; color: var(--text-muted); margin-bottom: 28px; text-align: right; }
+  .quiz-page { padding-top: 24px; }
 
-  .question-text { font-size: 22px; color: var(--text-primary); font-weight: bold; line-height: 1.5; margin-bottom: 28px; letter-spacing: 0.5px; }
+  .progress-bar-bg { width: 100%; height: 2px; background: rgba(255,255,255,0.04); margin-bottom: 8px; }
+  .progress-bar-fill { height: 100%; background: var(--accent-cyan); transition: width 0.4s cubic-bezier(0.16,1,0.3,1); box-shadow: 0 0 12px var(--glow-cyan); }
+  .progress-label { font-family: var(--font-display); font-size: 11px; color: var(--text-muted); margin-bottom: 36px; text-align: right; letter-spacing: 2px; }
 
-  .option-list { display: flex; flex-direction: column; gap: 14px; }
+  .question-text {
+    font-size: 22px; color: var(--text-primary); font-weight: 700;
+    line-height: 1.6; margin-bottom: 32px; letter-spacing: 0.5px;
+  }
+
+  .option-list { display: flex; flex-direction: column; gap: 12px; }
 
   .option {
-    background: var(--bg-card); border: 1.5px solid transparent;
-    border-radius: 16px; padding: 20px 20px; cursor: pointer;
+    background: var(--bg-card);
+    border: 1px solid var(--border-color); border-radius: 4px;
+    padding: 18px 20px; cursor: pointer;
     transition: all 0.25s ease; display: flex; align-items: flex-start; gap: 16px;
+    position: relative; overflow: hidden;
   }
-  .option:hover { border-color: rgba(255,255,255,0.15); background: rgba(255,255,255,0.06); }
-  .option.selected { border-color: var(--accent-red); background: rgba(255,71,87,0.08); }
+  .option::before {
+    content: ''; position: absolute; left: 0; top: 0; width: 2px; height: 100%;
+    background: var(--accent-cyan); opacity: 0; transition: opacity 0.25s ease;
+  }
+  .option:hover { border-color: rgba(0,255,200,0.15); background: rgba(0,255,200,0.02); }
+  .option:hover::before { opacity: 1; }
+  .option.selected { border-color: var(--accent-cyan); background: rgba(0,255,200,0.04); }
+  .option.selected::before { opacity: 1; }
   .option:active { transform: scale(0.98); }
 
   .option-letter {
-    width: 36px; height: 36px; border-radius: 10px; flex-shrink: 0;
+    width: 32px; height: 32px; border-radius: 2px; flex-shrink: 0;
     display: flex; align-items: center; justify-content: center;
-    font-size: 15px; font-weight: bold; color: var(--text-muted);
-    background: rgba(255,255,255,0.06); transition: all 0.25s ease;
+    font-family: var(--font-display); font-size: 12px; font-weight: 700;
+    color: var(--text-muted); background: rgba(255,255,255,0.04);
+    border: 1px solid var(--border-color); transition: all 0.25s ease;
   }
-  .option.selected .option-letter { background: var(--accent-red); color: #fff; }
+  .option.selected .option-letter { background: var(--accent-cyan); color: #000; border-color: var(--accent-cyan); }
 
   .option-text-wrap { flex: 1; }
-  .option-text { font-size: 16px; color: var(--text-secondary); line-height: 1.55; }
+  .option-text { font-size: 15px; color: var(--text-secondary); line-height: 1.6; }
 
   /* ===== 结果页 ===== */
-  .result-page { padding-top: 8px; }
+  .result-page { padding-top: 0; }
 
-  /* 结果头部 */
-  .result-header { text-align: center; margin-bottom: 36px; padding-top: 16px; }
-  .result-label { font-size: 16px; color: #999; display: block; margin-bottom: 18px; letter-spacing: 1px; }
-  .result-emoji { font-size: 72px; display: block; margin-bottom: 10px; line-height: 1; }
-  .result-name { font-size: 44px; font-weight: 900; color: #fff; display: block; letter-spacing: 4px; line-height: 1.2; margin-bottom: 4px; }
-  .result-en { font-size: 22px; color: #888; letter-spacing: 6px; display: block; margin-bottom: 16px; font-weight: bold; }
-  .tagline-box { background: rgba(255,71,87,0.08); border-radius: 14px; padding: 12px 22px; display: inline-block; }
-  .tagline { font-size: 17px; color: #ff6b81; font-style: italic; line-height: 1.5; }
+  .result-header {
+    text-align: center; margin-bottom: 40px; padding: 40px 20px 32px;
+    position: relative;
+    background: linear-gradient(180deg, rgba(0,255,200,0.02) 0%, transparent 100%);
+  }
+  .result-header::before {
+    content: ''; position: absolute; top: 0; left: 50%; transform: translateX(-50%);
+    width: 60px; height: 1px; background: var(--accent-cyan); opacity: 0.4;
+  }
+
+  .result-label {
+    font-size: 12px; color: var(--text-muted); display: block; margin-bottom: 20px;
+    letter-spacing: 4px; text-transform: uppercase;
+    font-family: var(--font-display);
+  }
+  .result-emoji { font-size: 64px; display: block; margin-bottom: 16px; line-height: 1; filter: saturate(1.2); }
+  .result-name {
+    font-size: 48px; font-weight: 900; color: var(--text-primary); display: block;
+    letter-spacing: 6px; line-height: 1.2; margin-bottom: 8px;
+    text-shadow: 0 0 60px var(--glow-cyan);
+  }
+  .result-en {
+    font-family: var(--font-display); font-size: 16px; color: var(--text-muted);
+    letter-spacing: 10px; display: block; margin-bottom: 20px; font-weight: 700;
+  }
+  .tagline-box {
+    border: 1px solid rgba(255,45,85,0.15); border-radius: 2px;
+    padding: 10px 24px; display: inline-block;
+    background: rgba(255,45,85,0.03);
+  }
+  .tagline { font-size: 15px; color: var(--accent-red); font-style: italic; line-height: 1.5; letter-spacing: 1px; }
 
   /* 区块标题 */
   .section-title {
-    font-size: 19px; font-weight: bold; color: #fff; display: block;
-    margin-bottom: 18px; position: relative; padding-left: 14px;
+    font-family: var(--font-display); font-size: 12px; font-weight: 700;
+    color: var(--accent-cyan); display: block; margin-bottom: 16px;
+    letter-spacing: 4px; text-transform: uppercase;
+    position: relative; padding-left: 16px;
   }
   .section-title::before {
-    content: ''; position: absolute; left: 0; top: 2px;
-    width: 4px; height: 19px; border-radius: 2px;
-    background: var(--accent-gradient);
+    content: '▍'; position: absolute; left: 0; top: 0;
+    color: var(--accent-cyan); font-size: 12px;
   }
 
   /* 人格解读 */
-  .desc-section { margin-bottom: 36px; }
+  .desc-section { margin-bottom: 40px; }
   .desc-content {
-    background: var(--bg-card); border-radius: 18px; padding: 24px;
-    border: 1px solid var(--border-color);
+    background: var(--bg-card); border-radius: 4px; padding: 28px;
+    border: 1px solid var(--border-color); position: relative;
+    animation: borderGlow 4s ease-in-out infinite;
   }
-  .desc-text { font-size: 16px; color: #ccc; line-height: 1.9; display: block; margin-bottom: 18px; }
+  .desc-text { font-size: 15px; color: var(--text-secondary); line-height: 2; display: block; margin-bottom: 16px; }
   .desc-text:last-child { margin-bottom: 0; }
 
-  /* 雷达图区域 */
-  .radar-section { background: var(--bg-card); border-radius: 18px; padding: 24px; margin-bottom: 32px; border: 1px solid var(--border-color); }
+  /* 雷达图 */
+  .radar-section {
+    background: var(--bg-card); border-radius: 4px; padding: 24px; margin-bottom: 36px;
+    border: 1px solid var(--border-color);
+  }
   .radar-canvas { width: 100%; height: 320px; display: block; }
 
-  /* 六维度评分列表 */
+  /* 六维度列表 */
   .dim-list { display: flex; flex-direction: column; }
   .dim-item {
     display: flex; justify-content: space-between; align-items: flex-start;
     padding: 18px 0; border-bottom: 1px solid var(--border-color);
   }
   .dim-item:last-child { border-bottom: none; }
-  .dim-name { font-size: 16px; color: #fff; font-weight: bold; display: block; margin-bottom: 4px; }
-  .dim-desc { font-size: 13px; color: #888; line-height: 1.55; display: block; }
+  .dim-name {
+    font-family: var(--font-display); font-size: 13px; color: var(--text-primary);
+    font-weight: 700; display: block; margin-bottom: 6px; letter-spacing: 1px;
+  }
+  .dim-desc { font-size: 13px; color: var(--text-muted); line-height: 1.6; display: block; }
   .dim-right { text-align: right; flex-shrink: 0; margin-left: 16px; }
-  .dim-level { font-size: 14px; font-weight: bold; display: block; margin-bottom: 2px; }
-  .dim-level.H { color: var(--accent-red); }
-  .dim-level.M { color: var(--accent-orange); }
-  .dim-level.L { color: #555; }
-  .dim-value { font-size: 16px; color: #bbb; font-weight: bold; }
+  .dim-level { font-family: var(--font-display); font-size: 11px; font-weight: 700; display: block; margin-bottom: 4px; letter-spacing: 2px; }
+  .dim-level.h { color: var(--accent-red); }
+  .dim-level.m { color: var(--accent-orange); }
+  .dim-level.l { color: var(--text-muted); }
+  .dim-value { font-family: var(--font-display); font-size: 18px; color: var(--text-primary); font-weight: 900; }
 
   /* 分享区 */
-  .share-section { margin-top: 32px; margin-bottom: 24px; }
-  .share-box { background: rgba(255,174,2,0.06); border: 1px solid rgba(255,174,2,0.15); border-radius: 14px; padding: 18px; margin-bottom: 14px; }
-  .share-text { font-size: 15px; color: #ddd; line-height: 1.65; display: block; word-break: break-all; }
-
-  /* 按钮 */
-  .btn-share {
-    width: 100%; height: 52px; border: none; border-radius: 26px;
-    background: var(--accent-gradient); color: #fff;
-    font-size: 17px; font-weight: bold; cursor: pointer; margin-bottom: 12px;
-    transition: all 0.2s ease;
+  .share-section { margin-top: 36px; margin-bottom: 28px; }
+  .share-box {
+    background: rgba(0,255,200,0.02); border: 1px solid rgba(0,255,200,0.08);
+    border-radius: 4px; padding: 20px; margin-bottom: 14px;
   }
+  .share-text { font-size: 14px; color: var(--text-secondary); line-height: 1.8; display: block; word-break: break-all; }
+
+  /* 按钮组 */
+  .btn-share {
+    width: 100%; height: 52px; border: 1px solid var(--accent-cyan); border-radius: 2px;
+    background: rgba(0,255,200,0.06); color: var(--accent-cyan);
+    font-family: var(--font-display); font-size: 13px; font-weight: 700;
+    cursor: pointer; margin-bottom: 12px; letter-spacing: 3px;
+    transition: all 0.3s ease;
+  }
+  .btn-share:hover { background: rgba(0,255,200,0.12); box-shadow: 0 0 20px var(--glow-cyan); }
   .btn-share:active { opacity: 0.85; transform: scale(0.98); }
 
   .btn-retest {
-    width: 100%; height: 44px; border: 1px solid var(--border-color); border-radius: 22px;
-    background: transparent; color: #666; font-size: 14px; cursor: pointer;
+    width: 100%; height: 44px; border: 1px solid var(--border-color); border-radius: 2px;
+    background: transparent; color: var(--text-muted);
+    font-size: 13px; cursor: pointer; letter-spacing: 2px;
     transition: all 0.2s ease;
   }
+  .btn-retest:hover { border-color: rgba(255,255,255,0.15); }
   .btn-retest:active { opacity: 0.7; }
 
   .btn-copy {
-    width: 100%; height: 40px; border: 1px solid var(--border-color); border-radius: 20px;
-    background: rgba(255,255,255,0.06); color: #ccc; font-size: 14px; cursor: pointer;
+    width: 100%; height: 40px; border: 1px solid var(--border-color); border-radius: 2px;
+    background: rgba(255,255,255,0.02); color: var(--text-muted);
+    font-size: 13px; cursor: pointer; letter-spacing: 1px;
     transition: all 0.2s ease;
   }
   .btn-copy:active { opacity: 0.7; }
 
-  /* 动画 */
-  @keyframes fadeInUp { from { opacity: 0; transform: translateY(24px); } to { opacity: 1; transform: translateY(0); } }
-  .animate-in { animation: fadeInUp 0.45s ease forwards; }
-  .delay-1 { animation-delay: 0.1s; opacity: 0; }
-  .delay-2 { animation-delay: 0.2s; opacity: 0; }
-  .delay-3 { animation-delay: 0.3s; opacity: 0; }
-  .delay-4 { animation-delay: 0.4s; opacity: 0; }
-  .delay-5 { animation-delay: 0.5s; opacity: 0; }
-
   /* 截图分享Canvas（隐藏） */
-  #shareCanvas { position: fixed; left: -9999px; top: -9999px; width: 750px; height: 1200px; }
+  #shareCanvas { position: fixed; left: -9999px; top: -9999px; width: 750px; height: 1600px; }
 </style>
 </head>
 <body>
@@ -185,25 +293,25 @@
 
   <!-- ========== 首页 ========== -->
   <div id="viewHome" class="home">
-    <div class="hero">
-      <div class="home-title">打工人被蒸馏难度测试</div>
-      <p class="home-desc">2 分钟，吓吓你。</p>
-      <button class="btn-start" onclick="startQuiz()">开始测试</button>
-    </div>
+    <div class="brand-tag">Zhēngliù Type Indicator</div>
+    <div class="home-title">ZLTI</div>
+    <div class="home-subtitle-cn">蒸馏型人格指标</div>
+    <div class="home-subtitle-en">Zhēngliù Type Indicator</div>
+    <div class="home-desc">测测 AI 蒸馏你的难度</div>
+    <button class="btn-start" onclick="startQuiz()">START</button>
     <div class="footer-text">版权归 @粥姨 所有，不允许商业用途</div>
   </div>
 
   <!-- ========== 答题页 ========== -->
   <div id="viewQuiz" class="quiz-page hidden">
     <div class="progress-bar-bg"><div id="progressBar" class="progress-bar-fill" style="width:12.5%"></div></div>
-    <div id="progressLabel" class="progress-label">1 / 8</div>
+    <div id="progressLabel" class="progress-label">01 / 08</div>
     <div id="questionText" class="question-text"></div>
     <div id="optionList" class="option-list"></div>
   </div>
 
   <!-- ========== 结果页 ========== -->
   <div id="viewResult" class="result-page hidden">
-    <!-- 结果头部 -->
     <div class="result-header animate-in">
       <span class="result-label">你在 AI 眼里是</span>
       <span id="resEmoji" class="result-emoji"></span>
@@ -212,47 +320,40 @@
       <div class="tagline-box"><span id="resTagline" class="tagline"></span></div>
     </div>
 
-    <!-- 人格解读 -->
     <div class="desc-section animate-in delay-1">
-      <span class="section-title">该人格的简单解读</span>
+      <span class="section-title">ANALYSIS</span>
       <div id="resDesc" class="desc-content"></div>
     </div>
 
-    <!-- 六维度雷达图 -->
-    <div class="animate-in delay-2" style="margin-bottom:32px;">
-      <span class="section-title">六维度扫描</span>
+    <div class="animate-in delay-2" style="margin-bottom:36px;">
+      <span class="section-title">DIMENSION SCAN</span>
       <div class="radar-section">
         <canvas id="radarChart" class="radar-canvas"></canvas>
       </div>
     </div>
 
-    <!-- 六维度评分列表 -->
     <div class="animate-in delay-3">
       <div id="dimList" class="dim-list"></div>
     </div>
 
-    <!-- 分享文案 -->
     <div class="share-section animate-in delay-4">
-      <span class="section-title">分享文案</span>
+      <span class="section-title">SHARE</span>
       <div class="share-box"><span id="resShareText" class="share-text"></span></div>
-      <button class="btn-copy" onclick="copyShareText()">📋 复制文案</button>
+      <button class="btn-copy" onclick="copyShareText()">复制文案</button>
     </div>
 
-    <!-- 操作按钮 -->
     <div class="animate-in delay-5" style="margin-top:28px;">
-      <button class="btn-share" onclick="generateShareImage()">📸 生成长图分享</button>
+      <button class="btn-share" onclick="generateShareImage()">生成分享长图</button>
       <button class="btn-retest" onclick="retest()">再测一次</button>
     </div>
-    
-    <!-- 隐藏的分享画布 -->
+
     <canvas id="shareCanvas"></canvas>
   </div>
 
 </div>
 
 <script>
-// ==================== 计分引擎（从小程序quiz-engine.js移植）====================
-
+// ==================== 计分引擎 ====================
 const QUESTIONS = [
   { id: 1, text: '你的工作，能教会一个实习生吗？', options: [
     { label:'A', text:'能，给他一份文档就行', scores:{r1:3,r3:0} },
@@ -319,54 +420,45 @@ function calcScores(answers) {
 
 const RESULTS = {
   skill:     { key:'skill',     name:'Skill人',   enName:'SKILL',    emoji:'🔴', tagline:'活成了AI训练数据。', hidden:false,
-    description:`你活得太标准了。几点干什么、怎么干、干到什么程度，全能写成操作手册。事实上你可能已经写了。\n\n别人还在纠结"我的工作有没有意义"，你已经把自己活成了一份完美的训练数据。日报比代码文档还规范，流程比自动化脚本还丝滑。AI看完你的工作记录直接哭了——感动的，因为终于遇到一个不需要理解、只需要复制粘贴的人了。\n\n隔壁公司已经拿离职员工的数据训练AI分身了。你连离职都不用——你在职的每一天，就是行走的训练集。网友说得好："数据提取完了，你可以走了。"散是打工人，聚是Token。\n\n你最大的问题不是"会被替代"。是你太忙了，忙到忘了自己除了"有用"，还可以"有趣"。`,
+    description:'你活得太标准了。几点干什么、怎么干、干到什么程度，全能写成操作手册。事实上你可能已经写了。\n\n别人还在纠结"我的工作有没有意义"，你已经把自己活成了一份完美的训练数据。日报比代码文档还规范，流程比自动化脚本还丝滑。AI看完你的工作记录直接哭了——感动的，因为终于遇到一个不需要理解、只需要复制粘贴的人了。\n\n隔壁公司已经拿离职员工的数据训练AI分身了。你连离职都不用——你在职的每一天，就是行走的训练集。网友说得好："数据提取完了，你可以走了。"散是打工人，聚是Token。\n\n你最大的问题不是"会被替代"。是你太忙了，忙到忘了自己除了"有用"，还可以"有趣"。',
     dimensions: { r1:{level:'H',value:9}, r2:{level:'L',value:2}, r3:{level:'L',value:2}, r4:{level:'L',value:2}, r5:{level:'L',value:2}, r6:{level:'L',value:2} },
-    shareText:'AI发来替代通知，我看了一眼——原来我早就是行走的训练集了。"散是打工人，聚是Token"。你呢？→' },
-
+    shareText:'我的ZLTI蒸馏型人格：Skill人。AI发来替代通知，我看了一眼——原来我早就是行走的训练集了。"散是打工人，聚是Token"。你呢？→' },
   flat:      { key:'flat',      name:'摆烂王',   enName:'FLAT',     emoji:'⚫', tagline:'AI发来替代通知，你看了，翻了个身。', hidden:false,
-    description:`你不是不知道AI在来。你知道。你看了新闻，刷了热搜，收藏了三篇"如何在AI时代保持竞争力"的文章。然后你继续躺着了。\n\n你的焦虑方式属于高级焦虑——不是不知道火烧到哪了，是觉得起来灭火太累了。\n\n你对AI的态度跟你对所有危机的态度一样：已读不回，静观其变，实在不行再说。\n\n但说真的？这种淡定反而是AI学不会的。AI必须对每条消息做出反应。你不用。在一个所有人都在秒回的时代，你有一种能力叫"不回应"。\n\n当然了——你最好还是把那三篇收藏文章打开看一下。`,
+    description:'你不是不知道AI在来。你知道。你看了新闻，刷了热搜，收藏了三篇"如何在AI时代保持竞争力"的文章。然后你继续躺着了。\n\n你的焦虑方式属于高级焦虑——不是不知道火烧到哪了，是觉得起来灭火太累了。\n\n你对AI的态度跟你对所有危机的态度一样：已读不回，静观其变，实在不行再说。\n\n但说真的？这种淡定反而是AI学不会的。AI必须对每条消息做出反应。你不用。在一个所有人都在秒回的时代，你有一种能力叫"不回应"。\n\n当然了——你最好还是把那三篇收藏文章打开看一下。',
     dimensions: { r1:{level:'H',value:7}, r2:{level:'L',value:2}, r3:{level:'M',value:4}, r4:{level:'L',value:2}, r5:{level:'L',value:3}, r6:{level:'L',value:3} },
-    shareText:'AI发来替代通知。我看了，截了图，发了朋友圈，翻了个身。毕竟我连老板的消息都不一定回，凭啥回AI的？你呢？→' },
-
+    shareText:'我的ZLTI蒸馏型人格：摆烂王。AI发来替代通知。我看了，截了图，发了朋友圈，翻了个身。毕竟我连老板的消息都不一定回，凭啥回AI的？你呢？→' },
   screw:     { key:'screw',     name:'螺丝钉',   enName:'SCREW',    emoji:'🟠', tagline:'绩效永远是3.5。', hidden:false,
-    description:`你是团队里那个不会被表扬、也不会被骂的人。周报永远最准时，PPT格式永远最规范，开会永远不迟到、也永远不第一个说话。\n\n你的绩效永远是3.5。不是因为你不好，是因为你好得太均匀了，均匀到系统觉得你是默认值。\n\nAI不需要干掉天才。天才太贵，不划算。AI只需要干掉你这种"差不多先生"——稳定输出、永不掉链子、但也永不出彩。标准的工业零件。\n\n更扎心的是：你大概率会用剩下的365天，继续做一模一样的事。你的敌人不是AI，是你自己那个"差不多就行"的惯性。\n\n好消息：你已经承认了。`,
+    description:'你是团队里那个不会被表扬、也不会被骂的人。周报永远最准时，PPT格式永远最规范，开会永远不迟到、也永远不第一个说话。\n\n你的绩效永远是3.5。不是因为你不好，是因为你好得太均匀了，均匀到系统觉得你是默认值。\n\nAI不需要干掉天才。天才太贵，不划算。AI只需要干掉你这种"差不多先生"——稳定输出、永不掉链子、但也永不出彩。标准的工业零件。\n\n更扎心的是：你大概率会用剩下的365天，继续做一模一样的事。你的敌人不是AI，是你自己那个"差不多就行"的惯性。\n\n好消息：你已经承认了。',
     dimensions: { r1:{level:'H',value:7}, r2:{level:'M',value:4}, r3:{level:'L',value:3}, r4:{level:'L',value:2}, r5:{level:'L',value:2}, r6:{level:'L',value:3} },
-    shareText:'我的AI替代类型：螺丝钉/SCREW。绩效永远是3.5，均匀到系统觉得我是默认值。你呢？→' },
-
+    shareText:'我的ZLTI蒸馏型人格：螺丝钉。绩效永远是3.5，均匀到系统觉得我是默认值。你呢？→' },
   slick:     { key:'slick',     name:'老油条',   enName:'SLICK',    emoji:'🟡', tagline:'经验还能撑三年，但正被偷师。', hidden:false,
-    description:`你有经验、有判断力、有那种"说不清但确实管用"的老师傅手感。AI目前搞不定你——注意，"目前"。\n\n三年前你觉得ChatGPT是玩具。现在它在写你同事的周报，润色你老板的邮件，还在面试你的下一任。再给它三年？\n\n你的护城河是经验堆起来的。但经验这东西，AI学起来不要三年，只要三个月的训练数据。\n\n好消息是：牛奶会过期，但学会酿酒的人永远有饭吃。三年够你从老油条变成老师傅——前提是你别在这三年继续只吃老本。`,
+    description:'你有经验、有判断力、有那种"说不清但确实管用"的老师傅手感。AI目前搞不定你——注意，"目前"。\n\n三年前你觉得ChatGPT是玩具。现在它在写你同事的周报，润色你老板的邮件，还在面试你的下一任。再给它三年？\n\n你的护城河是经验堆起来的。但经验这东西，AI学起来不要三年，只要三个月的训练数据。\n\n好消息是：牛奶会过期，但学会酿酒的人永远有饭吃。三年够你从老油条变成老师傅——前提是你别在这三年继续只吃老本。',
     dimensions: { r1:{level:'M',value:5}, r2:{level:'M',value:5}, r3:{level:'M',value:4}, r4:{level:'M',value:4}, r5:{level:'L',value:3}, r6:{level:'M',value:5} },
-    shareText:'我的AI替代类型：老油条/SLICK。经验还能撑三年，但AI正在偷我的活。你呢？→' },
-
+    shareText:'我的ZLTI蒸馏型人格：老油条。经验还能撑三年，但AI正在偷我的活。你呢？→' },
   nail:      { key:'nail',      name:'钉子户',   enName:'NAIL',     emoji:'🟢', tagline:'AI研究你三天，建模失败，跳过。', hidden:false,
-    description:`AI试着把你做成Skill。训练到一半报错了。\n\n不是你太强。是你太乱了。你的岗位描述跟你实际干的事，匹配度只有17%。你横跨四个部门，汇报线像一碗重庆小面，连HR都搞不清你到底是干嘛的。\n\nGitHub上现在最火的事是把同事做成Skill——聊天记录、工作文档、说话习惯全喂给AI。但你这个人，散了拼不回来，聚了也看不懂。你是AI训练集里的噪声数据。\n\n公司裁员裁不到你。不是因为你重要，是因为你的活没人接得住——也没人想接。\n\nAI替代讲的是"标准化"。你是标准化的反义词。`,
+    description:'AI试着把你做成Skill。训练到一半报错了。\n\n不是你太强。是你太乱了。你的岗位描述跟你实际干的事，匹配度只有17%。你横跨四个部门，汇报线像一碗重庆小面，连HR都搞不清你到底是干嘛的。\n\nGitHub上现在最火的事是把同事做成Skill——聊天记录、工作文档、说话习惯全喂给AI。但你这个人，散了拼不回来，聚了也看不懂。你是AI训练集里的噪声数据。\n\n公司裁员裁不到你。不是因为你重要，是因为你的活没人接得住——也没人想接。\n\nAI替代讲的是"标准化"。你是标准化的反义词。',
     dimensions: { r1:{level:'M',value:4}, r2:{level:'M',value:5}, r3:{level:'H',value:7}, r4:{level:'M',value:4}, r5:{level:'M',value:5}, r6:{level:'L',value:3} },
-    shareText:'AI试着把我做成Skill，训练到一半报错了。原因：岗位描述和实际工作匹配度17%。你呢？→' },
-
+    shareText:'我的ZLTI蒸馏型人格：钉子户。AI试着把我做成Skill，训练到一半报错了。原因：岗位描述和实际工作匹配度17%。你呢？→' },
   hack:      { key:'hack',      name:'外挂',     enName:'HACK',     emoji:'🩵', tagline:'你活成了AI高配版，还自带暴脾气。', hidden:false,
-    description:`你的朋友觉得你不太正常。\n\n效率高到离谱，日程精确到15分钟，同时处理五件事全不出错。微信回复速度比AI客服还快——但不像AI客服那样说几句就失忆、已读乱回。\n\n你既有AI的执行力，又有人的判断力。你是赛博增强人类。AI是你的低配阉割版。\n\n有人吐槽AI写文案"格式全删了还硬加英文，40分钟排版全白费"。你呢？你是那种AI搞砸之后被叫来擦屁股的人。\n\nAI替代不了你，原因很简单：你已经把AI的活了，还附赠了人的温度和一点暴脾气。`,
+    description:'你的朋友觉得你不太正常。\n\n效率高到离谱，日程精确到15分钟，同时处理五件事全不出错。微信回复速度比AI客服还快——但不像AI客服那样说几句就失忆、已读乱回。\n\n你既有AI的执行力，又有人的判断力。你是赛博增强人类。AI是你的低配阉割版。\n\n有人吐槽AI写文案"格式全删了还硬加英文，40分钟排版全白费"。你呢？你是那种AI搞砸之后被叫来擦屁股的人。\n\nAI替代不了你，原因很简单：你已经把AI的活干了，还附赠了人的温度和一点暴脾气。',
     dimensions: { r1:{level:'L',value:2}, r2:{level:'H',value:8}, r3:{level:'M',value:5}, r4:{level:'M',value:4}, r5:{level:'M',value:6}, r6:{level:'H',value:8} },
-    shareText:'我的AI替代类型：外挂/HACK。效率比AI高，脾气比AI大，还会在搞砸的时候骂人。AI是我的低配版。你是谁的外挂？→' },
-
+    shareText:'我的ZLTI蒸馏型人格：外挂。效率比AI高，脾气比AI大，还会在搞砸的时候骂人。AI是我的低配版。你是谁的外挂？→' },
   boss:      { key:'boss',      name:'甲方爸爸', enName:'BOSS',     emoji:'🔵', tagline:'食物链顶端，你负责提需求。', hidden:false,
-    description:`你不生产内容，你生产意见。你的核心能力不是做事，是让别人重做。\n\n所有干活的人都在瑟瑟发抖，只有你在研究怎么给AI提更刁钻的需求。\n\n你让AI写稿，改了八遍，最后说"还是第一版好"。让AI做PPT，做完说"感觉不对，你重新理解一下"。让AI排日程，排完临时推翻说"我今天想躺平"。\n\n有人被裁了，老板一周后打电话求他回来——因为AI接手后全是灾难。你就是那个打电话的角色。\n\n这个世界永远需要两种人：干活的，和不停改需求的。AI是前者的终极形态，你是后者的终极形态。这不是互补，这是食物链。\n\n你在上面。`,
+    description:'你不生产内容，你生产意见。你的核心能力不是做事，是让别人重做。\n\n所有干活的人都在瑟瑟发抖，只有你在研究怎么给AI提更刁钻的需求。\n\n你让AI写稿，改了八遍，最后说"还是第一版好"。让AI做PPT，做完说"感觉不对，你重新理解一下"。让AI排日程，排完临时推翻说"我今天想躺平"。\n\n有人被裁了，老板一周后打电话求他回来——因为AI接手后全是灾难。你就是那个打电话的角色。\n\n这个世界永远需要两种人：干活的，和不停改需求的。AI是前者的终极形态，你是后者的终极形态。这不是互补，这是食物链。\n\n你在上面。',
     dimensions: { r1:{level:'H',value:8}, r2:{level:'H',value:7}, r3:{level:'H',value:7}, r4:{level:'H',value:7}, r5:{level:'H',value:8}, r6:{level:'H',value:8} },
-    shareText:'我的AI替代类型：甲方爸爸/BOSS。我不生产内容，我只生产意见。食物链顶端，AI给我打工都累崩溃了。你呢？→' },
-
+    shareText:'我的ZLTI蒸馏型人格：甲方爸爸。我不生产内容，我只生产意见。食物链顶端，AI给我打工都累崩溃了。你呢？→' },
   bug:       { key:'bug',       name:'Bug',      enName:'BUG',      emoji:'🟣', tagline:'AI蓝屏三次。错误代码：你。', hidden:false,
-    description:`AI对你做了三轮建模。结果如下：\n\n第一轮：输入数据矛盾。你周一说"热爱工作"，周三说"想去摆摊"。建模失败。\n\n第二轮：行为预测准确率9%，比瞎猜还低。你上周二突然辞职学陶艺，预测模型当场炸了。\n\n第三轮：系统建议——放弃。你无法被蒸馏、无法被封装、无法被做成任何格式的Skill。原因：你的思维过程包含大量无法量化的参数，包括"心血来潮""突然不想了""管它呢""算了先吃个烧烤"。\n\n你就是让AI崩溃的那种人。不是因为你太强，是因为你太随机了。你是算法的天敌，是训练数据的毒药。\n\n但这不是bug。这是feature。\n\n当AI把全世界都算清楚的那天，你就是那个它永远解不出的方程。`,
+    description:'AI对你做了三轮建模。结果如下：\n\n第一轮：输入数据矛盾。你周一说"热爱工作"，周三说"想去摆摊"。建模失败。\n\n第二轮：行为预测准确率9%，比瞎猜还低。你上周二突然辞职学陶艺，预测模型当场炸了。\n\n第三轮：系统建议——放弃。你无法被蒸馏、无法被封装、无法被做成任何格式的Skill。原因：你的思维过程包含大量无法量化的参数，包括"心血来潮""突然不想了""管它呢""算了先吃个烧烤"。\n\n你就是让AI崩溃的那种人。不是因为你太强，是因为你太随机了。你是算法的天敌，是训练数据的毒药。\n\n但这不是bug。这是feature。\n\n当AI把全世界都算清楚的那天，你就是那个它永远解不出的方程。',
     dimensions: { r1:{level:'L',value:2}, r2:{level:'H',value:8}, r3:{level:'H',value:9}, r4:{level:'H',value:7}, r5:{level:'H',value:7}, r6:{level:'M',value:6} },
-    shareText:'AI分析我三轮，蓝屏三次。错误代码：HUMAN_UNDEFINED。原因是我的思维过程包含"心血来潮""算了先吃烧烤"。它最终建议：放弃。你呢？→' },
-
+    shareText:'我的ZLTI蒸馏型人格：Bug。AI分析我三轮，蓝屏三次。错误代码：HUMAN_UNDEFINED。它最终建议：放弃。你呢？→' },
   quit:      { key:'quit',      name:'AI离职了', enName:'QUIT',     emoji:'🌙', tagline:'AI替代了一天，主动放弃了。', hidden:true,
-    description:`不是AI替代不了你。是AI替代了一天，主动放弃了。\n\n协作日志是这样的：早上8点，你让AI写方案，brief就三个字："你懂的"。AI回"请提供更多信息"，你发了个表情包。10点半，AI写了5版，全被毙，理由："感觉不对"。AI问"哪里不对"，你已读不回。下午2点，你失联2小时，回来说"刚去喂了只流浪猫，突然想到一个新方向"。2点半，新方向比AI那5版都好。2点31分，AI提交离职申请。\n\nAI在离职信里写："建议将该用户归类为不可预测资源。不建议替代。不建议观察。建议远离。"`,
+    description:'不是AI替代不了你。是AI替代了一天，主动放弃了。\n\n协作日志是这样的：早上8点，你让AI写方案，brief就三个字："你懂的"。AI回"请提供更多信息"，你发了个表情包。10点半，AI写了5版，全被毙，理由："感觉不对"。AI问"哪里不对"，你已读不回。下午2点，你失联2小时，回来说"刚去喂了只流浪猫，突然想到一个新方向"。2点半，新方向比AI那5版都好。2点31分，AI提交离职申请。\n\nAI在离职信里写："建议将该用户归类为不可预测资源。不建议替代。不建议观察。建议远离。"',
     dimensions: { r1:{level:'L',value:2}, r2:{level:'H',value:8}, r3:{level:'H',value:9}, r4:{level:'H',value:8}, r5:{level:'H',value:9}, r6:{level:'H',value:7} },
-    shareText:'不是AI替代不了我。是AI替代了一天，主动提交了离职申请。理由："该用户为不可预测资源，建议远离"。你呢？→' },
-
+    shareText:'我的ZLTI蒸馏型人格：AI离职了。不是AI替代不了我。是AI替代了一天，主动提交了离职申请。你呢？→' },
   'last-one':{ key:'last-one',  name:'末日幸存者',enName:'LAST ONE', emoji:'🔥', tagline:'所有人都被替代了。你还活着。', hidden:true,
-    description:`AI替代人类的逻辑很简单：分析行为模式→建模→生成替代方案→执行。\n\n问题是——你没有行为模式。\n\n你处理危机的方式是"先慌一下，然后瞎搞，居然搞定了"。有人问你怕不怕AI，你说"行，替我上班吧，我去过我的人生"。\n\n马被拖拉机替代了，打字员被电脑替代了。但蟑螂呢？核弹炸完了蟑螂还在。你就是AI时代的蟑螂——这不是骂你，这是最高赞美。\n\n那些高效的、规矩的、可预测的人全被替代了。你不在名单上——因为替代算法的前提是"目标行为具有可预测性"，你的可预测性得分是：0。\n\n所有确定的东西都被AI接管之后，剩下的就是不确定性。\n\n而你，就是不确定性本身。`,
+    description:'AI替代人类的逻辑很简单：分析行为模式→建模→生成替代方案→执行。\n\n问题是——你没有行为模式。\n\n你处理危机的方式是"先慌一下，然后瞎搞，居然搞定了"。有人问你怕不怕AI，你说"行，替我上班吧，我去过我的人生"。\n\n马被拖拉机替代了，打字员被电脑替代了。但蟑螂呢？核弹炸完了蟑螂还在。你就是AI时代的蟑螂——这不是骂你，这是最高赞美。\n\n那些高效的、规矩的、可预测的人全被替代了。你不在名单上——因为替代算法的前提是"目标行为具有可预测性"，你的可预测性得分是：0。\n\n所有确定的东西都被AI接管之后，剩下的就是不确定性。\n\n而你，就是不确定性本身。',
     dimensions: { r1:{level:'L',value:1}, r2:{level:'H',value:9}, r3:{level:'H',value:10}, r4:{level:'H',value:8}, r5:{level:'H',value:9}, r6:{level:'H',value:8} },
-    shareText:'所有人都被AI替代了。我还活着。不是我强——是AI的替代算法对我跑不动。原因："行为可预测性：0"。我是AI时代的蟑螂，最高赞美。你呢？→' }
+    shareText:'我的ZLTI蒸馏型人格：末日幸存者。所有人都被AI替代了。我还活着。原因："行为可预测性：0"。你呢？→' }
 };
 
 function matchResult(s) {
@@ -387,7 +479,7 @@ function matchResult(s) {
 
 const DIM_META = { r1:{name:'可替代性'}, r2:{name:'情绪浓度'}, r3:{name:'混沌值'}, r4:{name:'摸鱼力'}, r5:{name:'反骨度'}, r6:{name:'存在感'} };
 const DIM_DESC = {
-  skill:  { r1:'你的工作流程清晰到可以直接喂给AI。', r2:'你的情绪管理能力太强了——强到像没情绪。', r3:'你的行为模式稳定如钟表。AI预测准确率94%。', r4:'你不是在摸鱼，你是在用效率消灭一切"无用时间"。', r5:"老板说往东你绝不看西。这种服从性让AI感动得直掉数据。", r6:'你在不在工位，系统运转速度差不多。' },
+  skill:  { r1:'你的工作流程清晰到可以直接喂给AI。', r2:'你的情绪管理能力太强了——强到像没情绪。', r3:'你的行为模式稳定如钟表。AI预测准确率94%。', r4:'你不是在摸鱼，你是在用效率消灭一切"无用时间"。', r5:'老板说往东你绝不看西。这种服从性让AI感动得直掉数据。', r6:'你在不在工位，系统运转速度差不多。' },
   flat:   { r1:'你的活不难，AI能干。但你自己好像也不太想干。', r2:'你的情绪只有一种：算了。高兴是"算了还行"，生气是"算了无所谓"。', r3:'你不是不可预测，你是可预测地躺着。', r4:'你不是在摸鱼。你是整条鱼都躺平了。上岸晒太阳了。', r5:'你不反抗，也不服从。你选择了第三条路：装没看见。', r6:'你在和不在，团队运转差不多。但茶水间少了个聊天的人。' },
   screw:  { r1:'你的工作有明确的SOP，AI上手只需读一遍文档。', r2:'你有情绪，但你学会了藏。', r3:'你做事有章法，可预测性强。AI建模准确率89%。', r4:'你把摸鱼的时间压缩到了极致——厕所多蹲了两分钟。', r5:'你几乎从不反抗。口头禅是"好的收到"。', r6:'你消失一天没人发现。但回来的那天积压的工作会让人想起你。' },
   slick:  { r1:'现在替代你要踩不少坑。但三年后？坑都被AI填平了。', r2:'你有情绪，但你学会了藏。"好的"背后全是脏话。', r3:'你做事有章法，但关键时刻靠直觉。直觉AI正在记笔记。', r4:'看起来在思考，实际上在想中午吃什么。', r5:'你知道什么时候发脾气最有效。这种精准反骨，AI确实学不来。', r6:'新人会问"这事以前怎么处理的"。答案是"问XX"。' },
@@ -395,7 +487,7 @@ const DIM_DESC = {
   hack:   { r1:'AI看了你的工作输出，沉默了。发现自己做不到。你是它的上位替代。', r2:'你干活带感情而且是浓烈的。开心产出翻倍不爽时会议室安静。', r3:'大部分时候像AI一样精准。偶尔突然做个决定然后证明是对的。', r4:'高效干完所有活然后用剩的时间做自己的事。这不叫摸鱼，叫时间管理。', r5:'你不盲从，反对的时候通常是对的——这让人害怕。', r6:'你在的时候"还好有你"，不在的时候"完了"。拔掉就卡死。' },
   boss:   { r1:'你做的事AI都能做——但它做不到让别人做了八遍还说好的没问题。', r2:'情绪浓度极高。"感觉不对"是你的高频词汇。', r3:'决策过程充满随机变量：心情、天气、中午吃了什么。AI无法建模。', r4:'花大量时间在做"看起来没用实际在酝酿灵感"的事情。', r5:'反骨度爆表。别人改需求，你改别人的需求。连AI的需求都敢驳回。', r6:'消失十分钟整个团队开始群聊"老板去哪了"。' },
   bug:    { r1:'AI替代你？连理解你都做不到。你在第一步就让它报错了。', r2:'你的情绪是你产出的燃料。心情好上热搜，心情不好上法院。', r3:'上一秒做A下一秒做B最后交出来C——最好的那版。决策过程是黑洞。', r4:'有大量时间在做"跟工作无关的事"。但最好的创意全是那些时间里冒出来的。', r5:'你有自己的频道。外界信号是白噪音。', r6:'在的时候"这人不太正常"，不在的时候"怎么这么无聊"。' },
-  quit:   { r1:'AI试了一天就放弃了。不是不能替代，是不值得。投入产出比为负。', r2:'情绪浓度爆表。产出跟心情高度绑定，AI无法建立稳定模型。', r3:'混沌值拉满。喂流浪猫都能喂出新方向。', r4:'"没用的事"占据大量时间。但那些时间里冒出的想法比AI跑100轮迭代都有价值。', r5:'反骨度不是高，是骨头长刺。对所有规则的反应："跟我有什么关系？"', r6:'存在感强——不是靠"在场"，是靠随时可能搞出大事"。' },
+  quit:   { r1:'AI试了一天就放弃了。不是不能替代，是不值得。投入产出比为负。', r2:'情绪浓度爆表。产出跟心情高度绑定，AI无法建立稳定模型。', r3:'混沌值拉满。喂流浪猫都能喂出新方向。', r4:'"没用的事"占据大量时间。但那些时间里冒出的想法比AI跑100轮迭代都有价值。', r5:'反骨度不是高，是骨头长刺。对所有规则的反应："跟我有什么关系？"', r6:'存在感强——不是靠"在场"，是靠随时可能搞出大事。' },
   'last-one':{ r1:'替代你？AI连坐标都找不到。数据库之外的存在。', r2:'感情充沛到AI以为你在malfunction。情绪建模结果：随机噪声。', r3:'没有行为模式。或者说行为模式就是"没有模式"。置信度不如掷硬币。', r4:'一半时间在做没用的事。但活到现在靠的就是这些。', r5:'不是反骨，是骨头长反了。压根没注意到大家在往东。', r6:'在的时候嫌你吵不在的时候想你闹。AI替代了所有人后世界安静了——太安静了。' }
 };
 
@@ -403,6 +495,7 @@ const DIM_DESC = {
 let answers = [];
 let currentQ = 0;
 let resultData = null;
+let resultScores = null;
 
 // ==================== 导航 ====================
 function show(id) { document.querySelectorAll('.app > div').forEach(el => el.classList.add('hidden')); document.getElementById(id).classList.remove('hidden'); }
@@ -417,8 +510,8 @@ function renderQuestion() {
   const q = QUESTIONS[currentQ];
   document.getElementById('questionText').textContent = q.text;
   document.getElementById('progressBar').style.width = ((currentQ + 1) / 8 * 100) + '%';
-  document.getElementById('progressLabel').textContent = `${currentQ + 1} / 8`;
-  
+  document.getElementById('progressLabel').textContent = `${String(currentQ+1).padStart(2,'0')} / 08`;
+
   const list = document.getElementById('optionList');
   list.innerHTML = q.options.map((opt, i) => `
     <div class="option" data-index="${i}" onclick="selectOption(${i})">
@@ -428,143 +521,118 @@ function renderQuestion() {
 }
 
 function selectOption(idx) {
-  // 高亮选中
   document.querySelectorAll('.option').forEach((el, i) => el.classList.toggle('selected', i === idx));
   answers[currentQ] = idx;
-  
   setTimeout(() => {
-    if (currentQ < 7) {
-      currentQ++;
-      renderQuestion();
-    } else {
-      showResult();
-    }
+    if (currentQ < 7) { currentQ++; renderQuestion(); }
+    else { showResult(); }
   }, 300);
 }
 
 // ==================== 结果展示 ====================
 function showResult() {
   const scores = calcScores(answers);
+  resultScores = scores;
   resultData = matchResult(scores);
   const r = resultData;
-  
-  // 填充头部
+
   document.getElementById('resEmoji').textContent = r.emoji;
   document.getElementById('resName').textContent = r.name;
   document.getElementById('resEn').textContent = r.enName;
-  document.getElementById('resTagline').textContent = `"${r.tagline}"`;
-  
-  // 填充描述
+  document.getElementById('resTagline').textContent = '"' + r.tagline + '"';
+
   const descEl = document.getElementById('resDesc');
   const paras = r.description.split('\n\n').filter(p => p.trim());
-  descEl.innerHTML = paras.map(p => `<p class="desc-text">${p.replace(/\n/g,'<br>')}</p>`).join('');
-  
-  // 填充分享文案
+  descEl.innerHTML = paras.map(p => '<p class="desc-text">' + p.replace(/\n/g,'<br>') + '</p>').join('');
+
   document.getElementById('resShareText').textContent = r.shareText;
-  
-  // 填充维度列表
+
   const dims = ['r1','r2','r3','r4','r5','r6'];
   const dimListEl = document.getElementById('dimList');
   const dimDescriptions = DIM_DESC[r.key] || {};
   dimListEl.innerHTML = dims.map(d => {
     const info = r.dimensions[d];
-    const levelMap = { H: '高风险', M: '中等', L: '低风险' };
-    return `<div class="dim-item">
-      <div class="dim-left"><span class="dim-name">${DIM_META[d].name}</span><span class="dim-desc">${dimDescriptions[d] || ''}</span></div>
-      <div class="dim-right"><span class="dim-level ${info.level.toLowerCase()}">${levelMap[info.level]}</span><span class="dim-value">${info.value}分</span></div>
-    </div>`;
+    const levelMap = { H: 'HIGH', M: 'MID', L: 'LOW' };
+    return '<div class="dim-item"><div class="dim-left"><span class="dim-name">' + DIM_META[d].name + '</span><span class="dim-desc">' + (dimDescriptions[d]||'') + '</span></div><div class="dim-right"><span class="dim-level ' + info.level.toLowerCase() + '">' + levelMap[info.level] + '</span><span class="dim-value">' + info.value + '</span></div></div>';
   }).join('');
-  
-  // 切换视图
+
   show('viewResult');
-  
-  // 绘制雷达图
+  window.scrollTo(0,0);
   setTimeout(() => drawRadar(scores), 350);
 }
 
-// ==================== 雷达图绘制（Canvas）====================
+// ==================== 雷达图 ====================
 function drawRadar(scores) {
   const canvas = document.getElementById('radarChart');
   if (!canvas) return;
-  
-  // 设置canvas物理尺寸匹配CSS尺寸
   const rect = canvas.getBoundingClientRect();
   const dpr = window.devicePixelRatio || 1;
   canvas.width = rect.width * dpr;
   canvas.height = rect.height * dpr;
-  
   const ctx = canvas.getContext('2d');
   ctx.scale(dpr, dpr);
-  
-  const w = rect.width;
-  const h = rect.height;
-  const cx = w / 2;
-  const cy = h / 2 + 8;
-  const radius = Math.min(cx, cy) - 30;
+
+  const w = rect.width, h = rect.height;
+  const cx = w / 2, cy = h / 2 + 8;
+  const radius = Math.min(cx, cy) - 36;
   const sides = 6;
   const dims = ['r1','r2','r3','r4','r5','r6'];
-  
-  // 角度（从顶部开始顺时针）
   const angles = [];
   for (let i = 0; i < sides; i++) angles.push(Math.PI * 2 * i / sides - Math.PI / 2);
-  
-  // 绘制网格（5层）
+
+  // 网格
   for (let lv = 1; lv <= 5; lv++) {
     const r = radius * (lv / 5);
     ctx.beginPath();
     for (let i = 0; i < sides; i++) {
-      const x = cx + r * Math.cos(angles[i]);
-      const y = cy + r * Math.sin(angles[i]);
+      const x = cx + r * Math.cos(angles[i]), y = cy + r * Math.sin(angles[i]);
       i === 0 ? ctx.moveTo(x,y) : ctx.lineTo(x,y);
     }
     ctx.closePath();
-    ctx.strokeStyle = `rgba(255,255,255,${0.04*lv})`;
-    ctx.lineWidth = 1;
-    ctx.stroke();
+    ctx.strokeStyle = 'rgba(0,255,200,' + (0.03*lv) + ')'; ctx.lineWidth = 1; ctx.stroke();
   }
-  
+
   // 轴线+标签
   for (let i = 0; i < sides; i++) {
     ctx.beginPath(); ctx.moveTo(cx,cy);
     ctx.lineTo(cx + radius*Math.cos(angles[i]), cy + radius*Math.sin(angles[i]));
-    ctx.strokeStyle = 'rgba(255,255,255,0.07)'; ctx.lineWidth = 1; ctx.stroke();
-    
-    const lr = radius + 18;
-    const lx = cx + lr * Math.cos(angles[i]);
-    const ly = cy + lr * Math.sin(angles[i]);
-    ctx.fillStyle = '#888'; ctx.font = '11px sans-serif';
+    ctx.strokeStyle = 'rgba(0,255,200,0.06)'; ctx.lineWidth = 1; ctx.stroke();
+
+    const lr = radius + 22;
+    const lx = cx + lr * Math.cos(angles[i]), ly = cy + lr * Math.sin(angles[i]);
+    ctx.fillStyle = '#668'; ctx.font = '11px sans-serif';
     ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
     ctx.fillText(DIM_META[dims[i]].name, lx, ly);
-    
     const v = scores[dims[i]];
-    ctx.fillStyle = v >= 7 ? '#ff4757' : v >= 4 ? '#ffa502' : '#555';
-    ctx.font = 'bold 11px sans-serif';
-    ctx.fillText(v.toString(), lx, ly + 13);
+    ctx.fillStyle = v >= 7 ? '#ff2d55' : v >= 4 ? '#ff9500' : '#444';
+    ctx.font = 'bold 12px sans-serif';
+    ctx.fillText(v.toString(), lx, ly + 14);
   }
-  
+
   // 数据区域
   ctx.beginPath();
   for (let i = 0; i < sides; i++) {
     const vr = radius * (scores[dims[i]] / 10);
-    const x = cx + vr * Math.cos(angles[i]);
-    const y = cy + vr * Math.sin(angles[i]);
+    const x = cx + vr * Math.cos(angles[i]), y = cy + vr * Math.sin(angles[i]);
     i === 0 ? ctx.moveTo(x,y) : ctx.lineTo(x,y);
   }
   ctx.closePath();
-  
   const grad = ctx.createRadialGradient(cx, cy, 0, cx, cy, radius);
-  grad.addColorStop(0, 'rgba(255,71,87,0.35)');
-  grad.addColorStop(1, 'rgba(255,165,2,0.12)');
+  grad.addColorStop(0, 'rgba(0,255,200,0.25)');
+  grad.addColorStop(1, 'rgba(0,255,200,0.03)');
   ctx.fillStyle = grad; ctx.fill();
-  ctx.strokeStyle = 'rgba(255,71,87,0.7)'; ctx.lineWidth = 2; ctx.stroke();
-  
+  ctx.strokeStyle = 'rgba(0,255,200,0.6)'; ctx.lineWidth = 2; ctx.stroke();
+
   // 数据点
   for (let i = 0; i < sides; i++) {
     const vr = radius * (scores[dims[i]] / 10);
-    const x = cx + vr * Math.cos(angles[i]);
-    const y = cy + vr * Math.sin(angles[i]);
+    const x = cx + vr * Math.cos(angles[i]), y = cy + vr * Math.sin(angles[i]);
     ctx.beginPath(); ctx.arc(x,y,3.5,0,Math.PI*2);
-    ctx.fillStyle = scores[dims[i]]>=7?'#ff4757':scores[dims[i]]>=4?'#ffa502':'#888';
+    ctx.fillStyle = scores[dims[i]]>=7?'#ff2d55':scores[dims[i]]>=4?'#ff9500':'#555';
+    ctx.fill();
+    // 发光效果
+    ctx.beginPath(); ctx.arc(x,y,6,0,Math.PI*2);
+    ctx.fillStyle = scores[dims[i]]>=7?'rgba(255,45,85,0.2)':scores[dims[i]]>=4?'rgba(255,149,0,0.15)':'rgba(85,85,85,0.1)';
     ctx.fill();
   }
 }
@@ -572,91 +640,163 @@ function drawRadar(scores) {
 // ==================== 分享功能 ====================
 function copyShareText() {
   navigator.clipboard.writeText(resultData.shareText).then(() => {
-    alert('✅ 已复制到剪贴板');
+    alert('已复制到剪贴板');
   }).catch(() => {
-    // fallback
     const ta = document.createElement('textarea');
     ta.value = resultData.shareText; document.body.appendChild(ta);
     ta.select(); document.execCommand('copy'); document.body.removeChild(ta);
-    alert('✅ 已复制');
+    alert('已复制');
   });
 }
 
 function generateShareImage() {
   const canvas = document.getElementById('shareCanvas');
-  const W = 750, H = 1200;
-  canvas.width = W;
-  canvas.height = H;
+  const W = 750, H = 1600;
+  canvas.width = W; canvas.height = H;
   const ctx = canvas.getContext('2d');
-  
   const r = resultData;
-  const scores = calcScores(answers);
-  
+  const scores = resultScores;
+
   // 背景
   const bgGrad = ctx.createLinearGradient(0,0,0,H);
-  bgGrad.addColorStop(0,'#111118'); bgGrad.addColorStop(1,'#0a0a0f');
+  bgGrad.addColorStop(0,'#0a0a10'); bgGrad.addColorStop(0.5,'#050508'); bgGrad.addColorStop(1,'#0a0a10');
   ctx.fillStyle = bgGrad; ctx.fillRect(0,0,W,H);
-  
-  // 装饰圆
+
+  // 装饰光晕
   ctx.globalAlpha = 0.04;
-  ctx.beginPath(); ctx.arc(W*0.82,H*0.12,160,0,Math.PI*2);
-  ctx.fillStyle = '#ff4757'; ctx.fill();
+  ctx.beginPath(); ctx.arc(W*0.2,H*0.08,180,0,Math.PI*2);
+  ctx.fillStyle = '#00ffc8'; ctx.fill();
+  ctx.beginPath(); ctx.arc(W*0.85,H*0.92,150,0,Math.PI*2);
+  ctx.fillStyle = '#ff2d55'; ctx.fill();
   ctx.globalAlpha = 1;
-  
-  // 标题
-  ctx.fillStyle='#666'; ctx.font='26px sans-serif'; ctx.textAlign='center';
-  ctx.fillText('「AI替代你的倒计时」测试结果',W/2,70);
-  
+
+  // 顶部品牌
+  ctx.textAlign = 'center';
+  ctx.fillStyle = '#00ffc8'; ctx.font = '600 18px sans-serif';
+  ctx.fillText('ZLTI', W/2, 60);
+  ctx.fillStyle = '#445'; ctx.font = '14px sans-serif';
+  ctx.fillText('蒸馏型人格指标', W/2, 84);
+
   // 分隔线
-  ctx.strokeStyle='rgba(255,255,255,0.08)'; ctx.beginPath();
-  ctx.moveTo(W*0.15,95); ctx.lineTo(W*0.85,95); ctx.stroke();
-  
-  // 名字
-  ctx.font='bold 72px sans-serif'; ctx.fillStyle='#fff';
-  ctx.fillText(`${r.emoji} ${r.name}`,W/2,180);
-  ctx.font='32px sans-serif'; ctx.fillStyle='#666';
-  ctx.fillText(r.enName,W/2,225);
-  ctx.font='28px sans-serif'; ctx.fillStyle='#ff6b81';
-  ctx.fillText(`"${r.tagline}"`,W/2,275);
-  
-  // 数据条
-  const dims=['r1','r2','r3','r4','r5','r6'];
-  let barY = 320;
+  ctx.strokeStyle = 'rgba(0,255,200,0.12)'; ctx.lineWidth = 1;
+  ctx.beginPath(); ctx.moveTo(W*0.3,105); ctx.lineTo(W*0.7,105); ctx.stroke();
+
+  // 结果名称
+  ctx.font = 'bold 64px sans-serif'; ctx.fillStyle = '#e8e8ec';
+  ctx.fillText(r.emoji + ' ' + r.name, W/2, 180);
+  ctx.font = 'bold 24px sans-serif'; ctx.fillStyle = '#556';
+  ctx.fillText(r.enName, W/2, 215);
+  ctx.font = '22px sans-serif'; ctx.fillStyle = '#ff2d55';
+  ctx.fillText('"' + r.tagline + '"', W/2, 258);
+
+  // 人格解读
+  ctx.textAlign = 'left';
+  ctx.fillStyle = '#00ffc8'; ctx.font = 'bold 16px sans-serif';
+  ctx.fillText('▍ ANALYSIS', 60, 310);
+  ctx.fillStyle = '#889'; ctx.font = '18px sans-serif';
+  const descLines = wrapTextLines(ctx, r.description.replace(/\n\n/g, '\n').replace(/\n/g, ' '), W - 120, 22);
+  let descY = 345;
+  descLines.forEach(line => { ctx.fillText(line, 60, descY); descY += 28; });
+
+  // 六维度数据条
+  const barStartY = descY + 30;
+  ctx.fillStyle = '#00ffc8'; ctx.font = 'bold 16px sans-serif';
+  ctx.fillText('▍ DIMENSION SCAN', 60, barStartY);
+
+  let barY = barStartY + 36;
+  const dims = ['r1','r2','r3','r4','r5','r6'];
   dims.forEach(d => {
-    const val=scores[d], barW=(val/10)*(W-140);
-    ctx.textAlign='left'; ctx.font='24px sans-serif'; ctx.fillStyle='#aaa';
-    ctx.fillText(DIM_META[d].name,70,barY);
-    ctx.textAlign='right'; ctx.fillStyle=val>=7?'#ff4757':val>=4?'#ffa502':'#555';
-    ctx.font='bold 24px sans-serif'; ctx.fillText(val.toString(),W-70,barY);
-    ctx.fillStyle='rgba(255,255,255,0.06)';
-    roundRect(ctx,70,barY+12,W-140,14,7); ctx.fill();
-    const c=val>=7?'#ff4757':val>=4?'#ffa502':'#444';
-    ctx.fillStyle=c;
-    roundRect(ctx,70,barY+12,barW,14,7); ctx.fill();
-    barY+=68;
+    const val = scores[d], barW = (val/10) * (W - 180);
+    ctx.textAlign = 'left'; ctx.font = '18px sans-serif'; ctx.fillStyle = '#889';
+    ctx.fillText(DIM_META[d].name, 60, barY);
+    ctx.textAlign = 'right'; ctx.fillStyle = val>=7?'#ff2d55':val>=4?'#ff9500':'#445';
+    ctx.font = 'bold 20px sans-serif'; ctx.fillText(val.toString(), W-60, barY);
+    // 背景条
+    ctx.fillStyle = 'rgba(255,255,255,0.03)';
+    roundRect(ctx,60,barY+10,W-120,10,5); ctx.fill();
+    // 数据条
+    ctx.fillStyle = val>=7?'#ff2d55':val>=4?'#ff9500':'#333';
+    roundRect(ctx,60,barY+10,barW,10,5); ctx.fill();
+    barY += 54;
   });
-  
-  // 文案
-  const textY=barY+40;
-  ctx.textAlign='center'; ctx.font='24px sans-serif'; ctx.fillStyle='#888';
-  wrapText(ctx,r.shareText,W/2,textY,W-80,34);
-  
-  // 底部
-  ctx.font='20px sans-serif'; ctx.fillStyle='#333';
-  ctx.fillText('扫码测测你是哪种 →',W/2,H-50);
-  
-  // 下载图片
+
+  // 分享文案
+  barY += 10;
+  ctx.textAlign = 'left';
+  ctx.fillStyle = '#00ffc8'; ctx.font = 'bold 16px sans-serif';
+  ctx.fillText('▍ SHARE', 60, barY);
+  barY += 32;
+  ctx.fillStyle = '#778'; ctx.font = '17px sans-serif';
+  const shareLines = wrapTextLines(ctx, r.shareText, W - 120, 22);
+  shareLines.forEach(line => { ctx.fillText(line, 60, barY); barY += 26; });
+
+  // 二维码区域
+  barY += 30;
+  ctx.textAlign = 'center';
+  // 二维码占位框
+  const qrSize = 140;
+  const qrX = W/2 - qrSize/2, qrY = barY;
+  ctx.strokeStyle = 'rgba(0,255,200,0.15)'; ctx.lineWidth = 1;
+  ctx.strokeRect(qrX, qrY, qrSize, qrSize);
+  // 绘制简易QR码（基于URL编码的点阵图案）
+  drawSimpleQR(ctx, qrX, qrY, qrSize);
+
+  ctx.fillStyle = '#556'; ctx.font = '14px sans-serif';
+  ctx.fillText('微信扫码 开始测试', W/2, qrY + qrSize + 28);
+
+  // 底部品牌
+  ctx.fillStyle = '#222'; ctx.font = '12px sans-serif';
+  ctx.fillText('版权归 @粥姨 所有', W/2, H - 40);
+
+  // 下载
   canvas.toBlob(blob => {
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
-    a.href = url; a.download = `AI替代类型-${r.name}.png`;
+    a.href = url; a.download = 'ZLTI-' + r.name + '.png';
     a.click(); URL.revokeObjectURL(url);
   });
 }
 
-function roundRect(ctx,x,y,w,h,r){ctx.beginPath();ctx.moveTo(x+r,y);ctx.lineTo(x+w-r,y);ctx.quadraticCurveTo(x+w,y,x+w,y+r);ctx.lineTo(x+w,y+h-r);ctx.quadraticCurveTo(x+w,y+h,x+w-r,y+h);ctx.lineTo(x,y+h-r);ctx.quadraticCurveTo(x,y+h,x,y+h-r);ctx.lineTo(x,y+r);ctx.quadraticCurveTo(x,y,x+r,y);ctx.closePath();}
+// 简易二维码绘制（生成指向网页的QR码图案）
+function drawSimpleQR(ctx, x, y, size) {
+  const url = 'https://izoechou.github.io/ai-quiz-distillation/ai-quiz.html';
+  // 使用API生成真实QR码
+  const img = new Image();
+  img.crossOrigin = 'anonymous';
+  img.onload = function() {
+    ctx.drawImage(img, x, y, size, size);
+    // 重新触发下载（因为QR是异步加载的）
+    const canvas = document.getElementById('shareCanvas');
+    canvas.toBlob(blob => {
+      const blobUrl = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = blobUrl; a.download = 'ZLTI-' + resultData.name + '.png';
+      a.click(); URL.revokeObjectURL(blobUrl);
+    });
+  };
+  img.onerror = function() {
+    // 降级：画一个带文字的占位框
+    ctx.fillStyle = 'rgba(0,255,200,0.05)';
+    ctx.fillRect(x, y, size, size);
+    ctx.fillStyle = '#556'; ctx.font = 'bold 14px sans-serif';
+    ctx.textAlign = 'center';
+    ctx.fillText('扫码测试', x + size/2, y + size/2 + 5);
+  };
+  img.src = 'https://api.qrserver.com/v1/create-qr-code/?size=' + size + 'x' + size + '&data=' + encodeURIComponent(url) + '&bgcolor=0a0a10&color=00ffc8&format=png';
+}
 
-function wrapText(ctx,text,x,y,maxW,lineH){let line='';for(const ch of text){const testLine=line+ch;if(ctx.measureText(testLine).width>maxW&&line.length>0){ctx.fillText(line,x,y);line=ch;y+=lineH;}else{line=testLine;}}ctx.fillText(line,x,y);}
+function wrapTextLines(ctx, text, maxW) {
+  const lines = []; let line = '';
+  for (const ch of text) {
+    const test = line + ch;
+    if (ctx.measureText(test).width > maxW && line.length > 0) { lines.push(line); line = ch; }
+    else { line = test; }
+  }
+  if (line) lines.push(line);
+  return lines;
+}
+
+function roundRect(ctx,x,y,w,h,r){ ctx.beginPath(); ctx.moveTo(x+r,y); ctx.lineTo(x+w-r,y); ctx.quadraticCurveTo(x+w,y,x+w,y+r); ctx.lineTo(x+w,y+h-r); ctx.quadraticCurveTo(x+w,y+h,x+w-r,y+h); ctx.lineTo(x+r,y+h); ctx.quadraticCurveTo(x,y+h,x,y+h-r); ctx.lineTo(x,y+r); ctx.quadraticCurveTo(x,y,x+r,y); ctx.closePath(); }
 
 function retest() { startQuiz(); }
 </script>
