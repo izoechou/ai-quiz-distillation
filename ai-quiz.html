@@ -740,9 +740,7 @@ function generateShareImage() {
   const qrX = W/2 - qrSize/2, qrY = barY;
   ctx.strokeStyle = 'rgba(0,255,200,0.15)'; ctx.lineWidth = 1;
   ctx.strokeRect(qrX, qrY, qrSize, qrSize);
-  // 绘制简易QR码（基于URL编码的点阵图案）
-  drawSimpleQR(ctx, qrX, qrY, qrSize);
-
+  
   ctx.fillStyle = '#556'; ctx.font = '14px sans-serif';
   ctx.fillText('微信扫码 开始测试', W/2, qrY + qrSize + 28);
 
@@ -750,17 +748,24 @@ function generateShareImage() {
   ctx.fillStyle = '#222'; ctx.font = '12px sans-serif';
   ctx.fillText('版权归 @粥姨 所有', W/2, H - 40);
 
-  // 下载
-  canvas.toBlob(blob => {
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url; a.download = 'ZLTI-' + r.name + '.png';
-    a.click(); URL.revokeObjectURL(url);
+  // 绘制QR码（异步，完成后触发最终下载）
+  drawSimpleQR(ctx, qrX, qrY, qrSize, function() {
+    // QR码绘制完毕 → 触发一次性下载
+    const dlCanvas = document.getElementById('shareCanvas');
+    dlCanvas.toBlob(blob => {
+      if (!blob) return;
+      const blobUrl = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = blobUrl;
+      a.download = 'ZLTI-' + r.name + '.png';
+      a.click();
+      URL.revokeObjectURL(blobUrl);
+    });
   });
 }
 
 // 使用qrcode.js前端库生成标准QR码（零外部依赖，100%可扫）
-function drawSimpleQR(ctx, x, y, size) {
+function drawSimpleQR(ctx, x, y, size, onDone) {
   const url = 'https://ai-quiz-distillation.vercel.app/ai-quiz.html';
   // 先画背景框
   ctx.fillStyle = '#0a0a10';
@@ -768,6 +773,16 @@ function drawSimpleQR(ctx, x, y, size) {
   
   // 用qrcode库生成到离屏canvas
   const qrCanvas = document.createElement('canvas');
+  
+  if (typeof QRCode === 'undefined') {
+    console.error('qrcode.js 未加载');
+    ctx.fillStyle = '#556';
+    ctx.font = 'bold 14px sans-serif';
+    ctx.textAlign = 'center';
+    ctx.fillText('扫码测试', x + size/2, y + size/2 + 5);
+    if (onDone) onDone();
+    return;
+  }
   
   QRCode.toCanvas(qrCanvas, url, {
     width: Math.min(size, 512),
@@ -781,25 +796,15 @@ function drawSimpleQR(ctx, x, y, size) {
       ctx.font = 'bold 14px sans-serif';
       ctx.textAlign = 'center';
       ctx.fillText('扫码测试', x + size/2, y + size/2 + 5);
+      if (onDone) onDone();
       return;
     }
     
     // 绘制到主canvas
     ctx.drawImage(qrCanvas, x, y, size, size);
     
-    // 重新触发下载（QR异步生成完毕后）
-    setTimeout(function() {
-      const canvas = document.getElementById('shareCanvas');
-      canvas.toBlob(blob => {
-        if (!blob) return;
-        const blobUrl = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = blobUrl;
-        a.download = 'ZLTI-' + resultData.name + '.png';
-        a.click();
-        URL.revokeObjectURL(blobUrl);
-      });
-    }, 200);
+    // 通知调用方：QR码已绘制完成
+    if (onDone) onDone();
   });
 }
 
