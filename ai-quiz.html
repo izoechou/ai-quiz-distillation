@@ -353,7 +353,7 @@
 
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.4/build/qrcode.min.js"></script>
+<script src="qrcode-gen.js"></script>
 <script>
 // ==================== 计分引擎 ====================
 const QUESTIONS = [
@@ -764,18 +764,15 @@ function generateShareImage() {
   });
 }
 
-// 使用qrcode.js前端库生成标准QR码（零外部依赖，100%可扫）
+// 使用qrcode-generator库（本地文件，零外部依赖）生成标准QR码
 function drawSimpleQR(ctx, x, y, size, onDone) {
   const url = 'https://ai-quiz-distillation.vercel.app/ai-quiz.html';
   // 先画背景框
   ctx.fillStyle = '#0a0a10';
   ctx.fillRect(x, y, size, size);
   
-  // 用qrcode库生成到离屏canvas
-  const qrCanvas = document.createElement('canvas');
-  
-  if (typeof QRCode === 'undefined') {
-    console.error('qrcode.js 未加载');
+  if (typeof qrcode === 'undefined') {
+    console.error('qrcode-gen.js 未加载');
     ctx.fillStyle = '#556';
     ctx.font = 'bold 14px sans-serif';
     ctx.textAlign = 'center';
@@ -784,28 +781,39 @@ function drawSimpleQR(ctx, x, y, size, onDone) {
     return;
   }
   
-  QRCode.toCanvas(qrCanvas, url, {
-    width: Math.min(size, 512),
-    margin: 1,
-    color: { dark: '#00ffc8', light: '#0a0a10' },
-    errorCorrectionLevel: 'M'
-  }, function(error) {
-    if (error) {
-      console.error('QR Error:', error);
-      ctx.fillStyle = '#556';
-      ctx.font = 'bold 14px sans-serif';
-      ctx.textAlign = 'center';
-      ctx.fillText('扫码测试', x + size/2, y + size/2 + 5);
-      if (onDone) onDone();
-      return;
+  try {
+    // qrcode-generator API: (typeNumber, errorCorrectionLevel)
+    var qr = qrcode(0, 'M'); // type 0 = auto-select
+    qr.addData(url);
+    qr.make();
+    
+    // 获取QR码模块数和cell大小
+    var moduleCount = qr.getModuleCount();
+    var cellSize = size / moduleCount;
+    
+    // 绘制QR模块到canvas（青色）
+    ctx.fillStyle = '#00ffc8';
+    for (var row = 0; row < moduleCount; row++) {
+      for (var col = 0; col < moduleCount; col++) {
+        if (qr.isDark(row, col)) {
+          var px = Math.round(x + col * cellSize);
+          var py = Math.round(y + row * cellSize);
+          var pw = Math.ceil(cellSize) || 1;
+          var ph = Math.ceil(cellSize) || 1;
+          ctx.fillRect(px, py, pw, ph);
+        }
+      }
     }
     
-    // 绘制到主canvas
-    ctx.drawImage(qrCanvas, x, y, size, size);
-    
-    // 通知调用方：QR码已绘制完成
     if (onDone) onDone();
-  });
+  } catch(e) {
+    console.error('QR生成失败:', e);
+    ctx.fillStyle = '#556';
+    ctx.font = 'bold 14px sans-serif';
+    ctx.textAlign = 'center';
+    ctx.fillText('扫码测试', x + size/2, y + size/2 + 5);
+    if (onDone) onDone();
+  }
 }
 
 function wrapTextLines(ctx, text, maxW) {
